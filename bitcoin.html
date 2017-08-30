@@ -1,0 +1,387 @@
+<html>
+
+<body>
+<h1>1. Introduction</h1>
+<p>Si vous &ecirc;tes int&eacute;ress&eacute;s par la technologie Bitcoin,voici le tutoriel pour cr&eacute;er &laquo; facilement &raquo; une monnaie alternative, un &laquo; altcoin &raquo; bas&eacute;e sur le code source de bitcoin 0.8.6.</p>
+<p>L'id&eacute;e de faire ce tutoriel m'est venu simplement apr&egrave;s avoir pass&eacute; pas mal de temps pour trouver des informations pour cr&eacute;er facilement un &laquo; altcoin &raquo; afin d'&eacute;tudier &laquo; gratuitement &raquo; le fonctionnement de Bitcoin.</p>
+<p>Pour ceci j'ai compil&eacute; pas mal d'informations issus d'autres sites afin de compiler facilement une version pour Windows.</p>
+<h1>2. Pr&eacute;paration</h1>
+<p>Cr&eacute;er son altcoin demande une certaine connaissance de l'utilisation d'outils informatiques.<br /> Il vous sera n&eacute;cessaire d'utiliser au moins une machine virtuelle (par exemple sous Virtualbox)</p>
+<p>Pour ma part pour ce tutoriel, j'ai utilise des machines virtuelles sous Windows XP 32 bits et Ubuntu Server 14 32 bits (l'id&eacute;al est d'avoir la machine virtuelle sous Ubuntu), je n'ai pas test&eacute; la compilation Windows sur une machine 64 bits, mais les ex&eacute;cutables compil&eacute;s fonctionnent sur les 2 versions.</p>
+<p>Avant de commencer il faut d&eacute;terminer certains param&egrave;tres :</p>
+<ul>
+<li>le nom de votre altcoin, et son abr&eacute;viations.</li>
+<li>le volume maximal d'unit&eacute;s de monnaie que vous voulez g&eacute;n&eacute;rer et dans quelle dur&eacute;e.</li>
+</ul>
+<h1>3. Exemple</h1>
+<p>Le mieux &eacute;tant de commencer par un exemple&hellip; Nous allons cr&eacute;er une monnaie nomm&eacute; Testcoin avec comme abr&eacute;viation TSC.</p>
+<h2>3.1 Copie du template</h2>
+<p>J'ai mis l'ensemble du projet sur un d&eacute;p&ocirc;t Github:</p>
+<p><a href="https://github.com/kletellier/foocoin">https://github.com/kletellier/foocoin</a></p>
+<p>Il suffit de cloner le d&eacute;p&ocirc;t ou bien de t&eacute;l&eacute;charger le dernier zip du master, le source de ce projet est bas&eacute; sur une version 0.8.6 de Bitcoin.</p>
+<p>L'id&eacute;al serait de placer votre projet dans le r&eacute;pertoire c:\testcoin</p>
+<h2>3.2 Renommage</h2>
+<ul>
+<li>
+<p>On va renommer l'ensemble des occurrences de foocoin vers testcoin, pour ceci il y a fart.exe dans le r&eacute;pertoire contrib, il va falloir le d&eacute;placer dans c:\testcoin en le copiant</p>
+</li>
+<li>
+<p>On ouvre une invite de commande cmd (&laquo; d&eacute;marrer &rarr; executer &rarr; cmd &raquo;)</p>
+</li>
+</ul>
+<p>Puis :</p>
+<blockquote>
+<p>c:<br /> cd c:\testcoin<br /> fart -r * foocoin testcoin<br /> fart -r * Foocoin Testcoin</p>
+</blockquote>
+<p>On renomme le fichier <em>foocoin-qt.pro</em> en <em>testcoin-qt.pro</em></p>
+<p>Ensuite on ouvre le fichier <em>src/qt/bitcoinunits.cpp</em></p>
+<p>&agrave; la ligne 37-39 on modifier :</p>
+<pre><code> case BTC: return QString("BTC");
+ case mBTC: return QString("mBTC");
+ case uBTC: return Qstring::fromUtf8("&mu;BTC");
+</code></pre>
+<p>Pour devenir</p>
+<pre><code>case BTC: return QString("TSC");
+case mBTC: return QString("mTSC ");
+case uBTC: return QString::fromUtf8("&mu;TSC ");
+</code></pre>
+<p>Ensuite pour les lignes 48-50</p>
+<pre><code>case BTC: return QString("Bitcoins");
+case mBTC: return QString("Milli-Bitcoins (1 / 1,000)");
+case uBTC: return QString("Micro-Bitcoins (1 / 1,000,000)");
+</code></pre>
+<p>deviendra</p>
+<pre><code>case BTC: return QString("Testcoins");
+case mBTC: return QString("Milli-Testcoins (1 / 1,000)");
+case uBTC: return QString("Micro-Testcoins (1 / 1,000,000)");
+</code></pre>
+<h2>3.3 Renommage des ent&ecirc;tes de messages</h2>
+<p>L'&eacute;tape suivante sera de changer les ent&ecirc;tes de messages :</p>
+<p>dans le fichier <em>src/main.cpp</em></p>
+<p>pour la ligne 3060</p>
+<pre><code>unsigned char pchMessageStart[4] = { 0xf9, 0xbe, 0xb4, 0xd9 };
+</code></pre>
+<p>on change les 4 bits :</p>
+<pre><code>unsigned char pchMessageStart[4] = { 0x07, 0x07, 0x01, 0x01 };
+</code></pre>
+<h2>3.4 Changement des num&eacute;ros de ports</h2>
+<p>L'&eacute;tape suivante est le changement des num&eacute;ros de port (RPC et P2P) :</p>
+<p>on va dans le fichier <em>src/init.cpp</em> :</p>
+<p>&agrave; la ligne 305</p>
+<pre><code>        "  -port=           " + _("Listen for connections on  (default: 8333 or testnet: 18333)") + "\n" +
+</code></pre>
+<p>devient</p>
+<pre><code>        "  -port=           " + _("Listen for connections on  (default: 9333 or testnet: 19333)") + "\n" +
+</code></pre>
+<p>et la ligne 346</p>
+<pre><code>"  -rpcport=        " + _("Listen for JSON-RPC connections on  (default: 9332 or testnet: 19332)") + "\n" +
+</code></pre>
+<p>devient</p>
+<pre><code>"  -rpcport=        " + _("Listen for JSON-RPC connections on  (default: 9332 or testnet: 19332)") + "\n" +
+</code></pre>
+<p>Dans le fichier <em>src/protocol.h</em></p>
+<p>&agrave; la ligne 23 :</p>
+<pre><code>return testnet ? 18333 : 8333;
+</code></pre>
+<p>devient</p>
+<pre><code>return testnet ? 19333 : 9333;
+</code></pre>
+<p>Dans le fichier <em>src/bitcoinrpc.cpp</em></p>
+<p>&agrave; la ligne 46 :</p>
+<pre><code> return GetBoolArg("-testnet", false) ? 18332 : 8332;
+</code></pre>
+<p>devient</p>
+<pre><code> return GetBoolArg("-testnet", false) ? 19332 : 9332;
+</code></pre>
+<h2>3.5 Changement du PUBKEY (premi&egrave;re lettre des adresses)</h2>
+<p>Ensuite on doit changer le PUBKEY, c'est ce qui donnera la premi&egrave;re lettre des adresses de votre monnaie. Il suffit d'aller chercher la valeur sur cette page :</p>
+<p><a title="Liste des pr&eacute;fixes" href="https://en.bitcoin.it/wiki/List_of_address_prefixes">https://en.bitcoin.it/wiki/List<em>of</em>address_prefixes</a></p>
+<p>Dans notre cas on choisira T, ce qui donne le chiffre 65</p>
+<p>on ouvre le fichier <em>src/base58.h</em> &agrave; la ligne 275</p>
+<pre><code>PUBKEY_ADDRESS = 0,
+</code></pre>
+<p>devient</p>
+<pre><code>PUBKEY_ADDRESS = 65,
+</code></pre>
+<h2>3.6 Calcul des r&eacute;compenses et de la masse globale &eacute;mise</h2>
+<p>L'&eacute;tape suivante est la partie qui permet de d&eacute;finir les param&egrave;tres de g&eacute;n&eacute;ration de votre monnaie.</p>
+<p>L'algorithme de Bitcoin permet de cr&eacute;er un certain volume de monnaie &agrave; chaque bloc pour r&eacute;compenser les mineurs, ce volume diminue avec le temps, il est divis&eacute; par 2 tout les x blocs min&eacute;s sachant que la dur&eacute;e entre les blocs est &agrave; d&eacute;finir, au final cela cr&eacute;e une valeur maximale de monnaie cr&eacute;e vers laquelle votre monnaie va tendre. Pour d&eacute;terminer ces chiffres il faut d&eacute;j&agrave; d&eacute;terminer quel sera la dur&eacute;e de validation d'un bloc, pour Bitcoin elle est de 10mn, dans notre cas on la d&eacute;finit &agrave; 2mn soit 120 sec.</p>
+<p>Dans le fichier <em>src/main.cpp</em> aux lignes 1084-1086</p>
+<pre><code>static const int64 nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
+static const int64 nTargetSpacing = 10 * 60;
+static const int64 nInterval = nTargetTimespan / nTargetSpacing;
+</code></pre>
+<p>nTargetSpacing repr&eacute;sente le nombre de secondes qui devra &ecirc;tre n&eacute;cessaire pour la cr&eacute;ation d'un bloc, on la d&eacute;finit dont &agrave; 120.</p>
+<p>La force de calcul augmentant avec le temps, les blocs risque de se calculer trop vite, Bitcoin impl&eacute;mente un syst&egrave;me de difficult&eacute; qui est r&eacute;-&eacute;valu&eacute; toutes les 2 semaines dans Bitcoin afin d'ajuster en permanence le temps de calcul &agrave; 10mn quelque-soit la force de calcul.</p>
+<p>Il faut donc ajuster nTargetTimespan, on le mettra &agrave; 1h soit 3600.</p>
+<p>L'&eacute;tape suivante consistera &agrave; d&eacute;finit &agrave; partir de combien de blocs valid&eacute;s les coin g&eacute;n&eacute;r&eacute;s seront consid&eacute;r&eacute;s comme mature, dans Bitcoin il faut attendre 100 validations pour utiliser des coins cr&eacute;es &agrave; la suite de l'ajout d'un bloc dans la blockchain, on d&eacute;finira le notre &agrave; 20.</p>
+<p>dans <em>src/main.h</em></p>
+<p>&agrave; la ligne 55 :</p>
+<pre><code>static const int COINBASE_MATURITY = 100;
+</code></pre>
+<p>devient</p>
+<pre><code>static const int COINBASE_MATURITY = 20 ;
+</code></pre>
+<p>L'&eacute;tape suivante consiste &agrave; d&eacute;finir la progression et le volume de g&eacute;n&eacute;ration des testcoins, pour cela j'ai cr&eacute;e une feuille LibreOffice qui se trouve dans le r&eacute;pertoire contrib, elle se nomme calcul_altcoin.ods</p>
+<p>en l'ouvrant on trouve 3 param&egrave;tres &agrave; gauche :</p>
+<ul>
+<li>Reward : Le nombre de coins donn&eacute;s &agrave; chaque cr&eacute;ation de bloc (pour le 1er bloc)</li>
+<li>Subsidy : Le nombre de blocs n&eacute;cessaires avant de divis&eacute; le reward par 2</li>
+<li>Duration : la dur&eacute;e de g&eacute;n&eacute;ration d'un bloc.</li>
+</ul>
+<p>En ajustant les 3 param&egrave;tres on peut d&eacute;terminer la date vers la laquelle notre monnaie aura g&eacute;n&eacute;r&eacute; tout ses coins et le nombre maximal, dans notre cas si l'on donne 125 coins et qu'on divise par 2 cette valeur &agrave; chaque 400 blocs pour des blocs de 2 mn on obtient environ 100000 coins maximum en &agrave; peu pr&egrave;s 1 semaine.</p>
+<p>On garde donc ses param&egrave;tres de cot&eacute;.</p>
+<p>On va d&eacute;finir la valeur maximale<br /> dans <em>src/main.h</em> &agrave; la ligne 52 :</p>
+<pre><code>static const int64 MAX_MONEY = 21000000 * COIN;
+</code></pre>
+<p>devient</p>
+<pre><code>static const int64 MAX_MONEY = 100000 * COIN;
+</code></pre>
+<p>Ensuite on doit d&eacute;finir que l'on donne 125 coins au d&eacute;but et qu'on divise &agrave; chaque 400 blocs (800 mn)</p>
+<p>on va donc dans <em>src/main.cpp</em> ligne 1074</p>
+<pre><code>int64 static GetBlockValue(int nHeight, int64 nFees)
+{
+    int64 nSubsidy = 50 * COIN;
+
+    // Subsidy is cut in half every 210000 blocks, which will occur approximately every 4 years
+    nSubsidy &gt;&gt;= (nHeight / 210000);
+
+    return nSubsidy + nFees;
+}
+</code></pre>
+<p>devient</p>
+<pre><code>int64 static GetBlockValue(int nHeight, int64 nFees)
+{
+    int64 nSubsidy = 125 * COIN;
+
+    // Subsidy is cut in half every 400 blocks
+    nSubsidy &gt;&gt;= (nHeight / 400);
+
+    return nSubsidy + nFees;
+}
+</code></pre>
+<h2>3.7 G&eacute;n&eacute;ration du Genesis Block</h2>
+<p>L'&eacute;tape suivante est un peu plus complexe et fait entrer en jeu pour la premi&egrave;re fois notre machine virtuelle, ils s'agit de calculer le bloc original, le genesis block.</p>
+<p>Ce bloc &agrave; pour but de d&eacute;finir le d&eacute;but de votre blockchain, pour cela l'id&eacute;al est d'avoir une phrase situant la date de d&eacute;but de votre monnaie dans l'exemple de Bitcoin : &laquo; The Times 03/Jan/2009 Chancellor on brink of second bailout for banks &raquo; est issu d'un article de journal, ce qui prouve facilement la date initiale du bloc (et donc qu'aucun bloc et aucune transaction ne peut exister auparavant).</p>
+<p>Nous prendrons &laquo; Le 25 noel 2014 le pere noel est passe &raquo;</p>
+<p>Il faut aussi une date au format UNIX en allant sur le site <a title="Epoch time" href="http://www.epochconverter.com/">http://www.epochconverter.com/</a></p>
+<p>nous prenons la date UNIX actuelle : 1419416375</p>
+<p>Ensuite j'utilise un script issus de ce d&eacute;p&ocirc;t : <a href="https://github.com/lhartikk/GenesisH0">https://github.com/lhartikk/GenesisH0</a></p>
+<p>j'ai modifi&eacute; le script pour passer la difficult&eacute; de 32 &agrave; 20 bits car sinon la puissance de calcul sur un petit r&eacute;seau de 2 pc rend le minage trop long&hellip;</p>
+<p>Ce script se trouve dans contrib il s'appelle <em>genesis_ld.py</em> la version 32 bits <em>genesis.py</em></p>
+<p>Pour l' ex&eacute;cuter sur notre machine Ubuntu il faut installer les paquets python pycrypto et construct</p>
+<p>puis lancer</p>
+<pre><code>python genesis_ld.py -z "Le 25 noel 2014 le pere noel est passe " -t 1419416375
+</code></pre>
+<p>apr&egrave;s quelques minutes (ou quelques heures en version 32 bits) il va vous g&eacute;n&eacute;rer les donn&eacute;es suivantes :</p>
+<blockquote>
+<p>algorithm: SHA256<br /> merkle hash: 0410191ecb81668ab68f707ee4e105242fd776ff34a99206fb9717b00135038a<br /> pszTimestamp: Le 25 noel 2014 le pere noel est passe<br /> pubkey: 04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f<br /> time: 1419416375<br /> bits: 0x1e0ffff0<br /> nonce: 1540800<br /> genesis hash: 0000006036353e4336d653b2d82f1630a26c2cae6a1e2f09b8ee0a9f023ed9bd</p>
+</blockquote>
+<p>Nous allons maintenant le d&eacute;finir dans le source</p>
+<p>dans <em>src/main.cpp</em></p>
+<p>&agrave; la ligne 2760</p>
+<pre><code>const char* pszTimestamp = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
+</code></pre>
+<p>devient</p>
+<pre><code>const char* pszTimestamp = "Le 25 noel 2014 le pere noel est passe ";
+</code></pre>
+<p>&agrave; la ligne 2766</p>
+<pre><code>txNew.vout[0].scriptPubKey = CScript() &lt;&lt; ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") &lt;&lt; OP_CHECKSIG;
+</code></pre>
+<p>on recopie le pubkey trouv&eacute; par le genesis.py</p>
+<pre><code>txNew.vout[0].scriptPubKey = CScript() &lt;&lt; ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") &lt;&lt; OP_CHECKSIG;
+</code></pre>
+<p>ensuite aux lignes 2772-2774</p>
+<pre><code>block.nTime    = 1231006505;
+block.nBits    = 0x1d00ffff;
+block.nNonce   = 2083236893;
+</code></pre>
+<p>devient avec les valeurs trouv&eacute;s par le genesis.py</p>
+<pre><code>block.nTime    = 1419416375;
+block.nBits    =  0x1e0ffff0 ;
+block.nNonce   = 1540800;
+</code></pre>
+<p>&agrave; la ligne 2787 on rentre le merkle root</p>
+<pre><code> assert(block.hashMerkleRoot == uint256("0x4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"));
+</code></pre>
+<p>&nbsp;</p>
+<p>devient</p>
+<pre><code> assert(block.hashMerkleRoot == uint256("0x410191ecb81668ab68f707ee4e105242fd776ff34a99206fb9717b00135038a"));
+</code></pre>
+<p>On va rentrer le hash du bloc de gen&egrave;se :<br /> &agrave; la ligne 34</p>
+<pre><code>uint256 hashGenesisBlock("0x000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f");
+</code></pre>
+<p>devient</p>
+<pre><code>uint256 hashGenesisBlock("0x0000006036353e4336d653b2d82f1630a26c2cae6a1e2f09b8ee0a9f023ed9bd");
+</code></pre>
+<p>si vous avez d&eacute;cid&eacute; d'utiliser la version 20 bits, on va aussi diminuer la difficult&eacute; &agrave; la ligne 35 en la passant de 32 &agrave; 20 bits.</p>
+<pre><code>static CBigNum bnProofOfWorkLimit(~uint256(0) &gt;&gt; 32);
+</code></pre>
+<p>devient</p>
+<pre><code>static CBigNum bnProofOfWorkLimit(~uint256(0) &gt;&gt; 20);
+</code></pre>
+<h2>3.8 D&eacute;finition des checkpoints</h2>
+<p>Ensuite dans <em>src/checkpoints.cpp</em></p>
+<p>&agrave; la ligne 36 on va d&eacute;finir les points de passage dans la chaine des blocs, dans notre cas seul le genesis block :</p>
+<pre><code> static MapCheckpoints mapCheckpoints =
+        boost::assign::map_list_of
+        ( 11111, uint256("0x0000000069e244f73d78e8fd29ba2fd2ed618bd6fa2ee92559f542fdb26e7c1d"))
+        ( 33333, uint256("0x000000002dd5588a74784eaa7ab0507a18ad16a236e7b1ce69f00d7ddfb5d0a6"))
+        ( 74000, uint256("0x0000000000573993a3c9e41ce34471c079dcf5f52a0e824a81e7f953b8661a20"))
+        (105000, uint256("0x00000000000291ce28027faea320c8d2b054b2e0fe44a773f3eefb151d6bdc97"))
+        (134444, uint256("0x00000000000005b12ffd4cd315cd34ffd4a594f430ac814c91184a0d42d2b0fe"))
+        (168000, uint256("0x000000000000099e61ea72015e79632f216fe6cb33d7899acb35b75c8303b763"))
+        (193000, uint256("0x000000000000059f452a5f7340de6682a977387c17010ff6e6c3bd83ca8b1317"))
+        (210000, uint256("0x000000000000048b95347e83192f69cf0366076336c639f9b7228e9ba171342e"))
+        (216116, uint256("0x00000000000001b4f4b433e81ee46494af945cf96014816a4e2370f11b23df4e"))
+        (225430, uint256("0x00000000000001c108384350f74090433e7fcf79a606b8e797f065b130575932"))
+        (250000, uint256("0x000000000000003887df1f29024b06fc2200b55f8af8f35453d7be294df2d214"))
+        ;
+    static const CCheckpointData data = {
+        &amp;mapCheckpoints,
+        1375533383, // * UNIX timestamp of last checkpoint block
+        21491097,   // * total number of transactions between genesis and last checkpoint
+                    //   (the tx=... number in the SetBestChain debug.log lines)
+        60000.0     // * estimated number of transactions per day after checkpoint
+    };
+</code></pre>
+<p>devient</p>
+<pre><code> static MapCheckpoints mapCheckpoints =
+        boost::assign::map_list_of
+        ( 0, uint256("0x0000006036353e4336d653b2d82f1630a26c2cae6a1e2f09b8ee0a9f023ed9bd"))
+
+        ;
+    static const CCheckpointData data = {
+        &amp;mapCheckpoints,
+        1419416375, // * UNIX timestamp of last checkpoint block
+        0,   // * total number of transactions between genesis and last checkpoint
+                    //   (the tx=... number in the SetBestChain debug.log lines)
+        300.0     // * estimated number of transactions per day after checkpoint
+    };
+</code></pre>
+<h2>3.9 D&eacute;finition des n&oelig;uds majeurs</h2>
+<p>Ensuite on d&eacute;finit les n&oelig;uds majeurs (ce sont les adresses ip des clients sur qui poss&eacute;deront une copie certifi&eacute;e de la blockchain ), cette op&eacute;ration est n&eacute;cessaire si vous rendez public votre altcoin.<br /> Il suffira alors de lancer sur cette IP une instance de votre daemon que nous allons compiler dans le chapitre suivant.</p>
+<p>dans <em>src/net.cpp</em> &agrave; la ligne 1193</p>
+<pre><code>static const char *strMainNetDNSSeed[][5] = {
+    {"bitcoin.sipa.be", "seed.bitcoin.sipa.be"},
+    {"bluematt.me", "dnsseed.bluematt.me"},
+    {"dashjr.org", "dnsseed.bitcoin.dashjr.org"},
+    {"xf2.org", "bitseed.xf2.org"},
+    {NULL, NULL}
+};
+</code></pre>
+<p>devient</p>
+<pre><code>static const char *strMainNetDNSSeed[][5] = {
+
+    {NULL, NULL}
+};
+</code></pre>
+<h1>4. Compilation</h1>
+<h2>4.1 Compilation sous Ubuntu</h2>
+<p>L'&eacute;tape suivante est la compilation dans un premier temps sur Ubuntu il faudra installer composant n&eacute;cessaire :</p>
+<pre><code>sudo apt-get install build-essential libboost-all-dev libcurl4-openssl-dev libdb5.1-dev libdb5.1++-dev git qt-sdk libminiupnpc-dev libssl-dev
+</code></pre>
+<p>Copier vos sources dans un r&eacute;pertoire de votre machine virtuelle Ubuntu</p>
+<p>Puis ensuite en allant dans le r&eacute;pertoire src /levedb</p>
+<pre><code>chmod 755 build *
+</code></pre>
+<p>et on compile leveldb</p>
+<pre><code>make libleveldb.a libmemenv.a
+</code></pre>
+<p>puis de nouveau dans src et tapez</p>
+<pre><code>make -f makefile.unix
+</code></pre>
+<p>vous devriez avoir un testcoind dans le r&eacute;pertoire &agrave; la fin de la compilation,<br /> ensuite on execute strip testcoind afin de r&eacute;trecir l'executable</p>
+<p>on l'execute :</p>
+<pre><code>./testcoind &amp;
+</code></pre>
+<p>au bout de quelques secondes un message appara&icirc;t :</p>
+<blockquote>
+<p>/home/administrateur/.testcoin/testcoin.conf<br /> It is recommended you use the following random password:<br /> rpcuser=testcoinrpc<br /> rpcpassword=595S2Fd4EM8KT3ktnUmooE81zLc4n1e73rmmdCT7q4YJ<br /> (you do not need to remember this password)<br /> The username and password MUST NOT be the same.</p>
+</blockquote>
+<p>Vous devez cr&eacute;er un fichier <em>testcoin.conf</em> dans le r&eacute;pertoire .testcoin de votre profil actuel (ici administrateur) et ajouter :</p>
+<blockquote>
+<p>rpcuser=testcoinrpc<br /> rpcpassword=595S2Fd4EM8KT3ktnUmooE81zLc4n1e73rmmdCT7q4YJ</p>
+</blockquote>
+<p>Une fois ce fichier cr&eacute;e vous relancer votre instance du daemon :</p>
+<pre><code>./testcoind &amp;
+</code></pre>
+<p>puis vous lancer</p>
+<pre><code>./testcoind getinfo
+</code></pre>
+<p>vous obtenez normalement :</p>
+<blockquote>
+<p>{<br /> "version" : 80600, "protocolversion" : 70001, "walletversion" : 60000, "balance" : 0.00000000, "blocks" : 0, "timeoffset" : 0, "connections" : 0, "proxy" : "", "difficulty" : 0.00024414, "testnet" : false, "keypoololdest" : 1419426388, "keypoolsize" : 101, "paytxfee" : 0.00000000, "errors" : "" }</p>
+</blockquote>
+<p>Votre daemon fonctionne !!!</p>
+<p>Stoppons le avec la commande</p>
+<pre><code>./testcoind stop
+</code></pre>
+<h2>4.2 Compilation sous Windows</h2>
+<p>D&eacute;sormais on s'attaque &agrave; la compilation du daemon et du Wallet QT sur Windows</p>
+<p>Pour &ccedil;a j'ai r&eacute;cup&eacute;rer un script qui permet d'automatiser cette tache, je l'ai pris dans ce d&eacute;p&ocirc;t :</p>
+<p><a href="https://github.com/phelixbtc/bitcoin/tree/0.8.5-EWB">https://github.com/phelixbtc/bitcoin/tree/0.8.5-EWB</a></p>
+<p>Dans mon projet il se trouve dans contrib/easywinbuilder</p>
+<p>Il suffit alors simplement d'&eacute;xecuter le fichier : <em>__all_easywinbuilder.bat</em></p>
+<p>et de suivre les instructions &agrave; l'&eacute;cran, &agrave; la fin vous devez avoir un testcoind.exe et un r&eacute;pertoire de build avec votre Wallet QT</p>
+<h1>5. Minage de votre altcoin</h1>
+<p>&Eacute;tape suivante et la plus int&eacute;ressante le test pour v&eacute;rifier le minage de vos coins :</p>
+<p>On va lancer l&rsquo;ex&eacute;cutable Windows , il faut prendre le fichier testcoind.exe pr&eacute;sent dans le r&eacute;pertoire source et le mettre dans un autre r&eacute;pertoire, on va aussi y copier les fichiers :</p>
+<ul>
+<li>libgcc_s_dw2-1.dll</li>
+<li>libstdc++-6.dll</li>
+<li>mingwm10.dll</li>
+</ul>
+<p>pr&eacute;sents dans le r&eacute;pertoire release (celui ou se trouve le protefeuille Qt)</p>
+<p>On ouvre une fen&ecirc;tre de commande cmd et on lance testcoind</p>
+<p>On a le m&ecirc;me message d'erreur que sur la version ubuntu qui demande de cr&eacute;er un mot de passe RPC, il faudra donc cr&eacute;er le fichier testcoin.conf dans <em>C:\Users\utilisateur\AppData\Roaming\Testcoin</em></p>
+<p>Il faut lancer ensuite la machine virtuelle avec Ubuntu, et conna&icirc;tre son adresse IP , pour cela on utilise la commande ifconfig.</p>
+<p>Dans notre cas 192.168.0.153</p>
+<p>Puis celle de notre PC sous windows (avec ce coup ci la commande ipconfig que l'on execute dans une fen&ecirc;tre de commande)</p>
+<p>Dans notre cas 192.168.0.150</p>
+<p>On va donc lancer nos 2 testcoind,</p>
+<p>On va rajouter une ligne addnode=192.168.0.150 dans <em>/home//.testcoin/testcoin.conf</em></p>
+<p>on lance donc</p>
+<pre><code> ./testcoind  &amp;
+</code></pre>
+<p>On rajoute aussi une ligne addnode=192.168.0.153 dans <em>C:\Users\utilisateur\AppData\Roaming\Testcoin\testcoin.conf</em></p>
+<p>Puis on lance sur windows dans une fen&ecirc;tre de commande, en le connectant sur la machine Ubuntu</p>
+<pre><code>testcoind
+</code></pre>
+<p>&nbsp;</p>
+<p>on retourne sur la machine Ubuntu et on execute la commande</p>
+<pre><code>./testcoind getinfo
+</code></pre>
+<p>et on a le message suivant :</p>
+<blockquote>
+<p>{<br /> "version" : 80600, "protocolversion" : 70001, "walletversion" : 60000, "balance" : 0.00000000, "blocks" : 0, "timeoffset" : 0, "connections" : 1, "proxy" : "", "difficulty" : 0.00024414, "testnet" : false, "keypoololdest" : 1420445245, "keypoolsize" : 101, "paytxfee" : 0.00000000, "errors" : "" }</p>
+</blockquote>
+<p>connections = 1 sp&eacute;cifie que la connexion est effectu&eacute; entre les 2 machines.</p>
+<p>On va pouvoir lancer le minage sur la machine ubuntu :</p>
+<pre><code>./testcoind getnewaddress ""
+</code></pre>
+<p>permet de cr&eacute;er une adresse dans le portefeuille</p>
+<p>on lance le minage :</p>
+<pre><code>./testcoind setgenerate true 16
+</code></pre>
+<p>On lance la commande :</p>
+<pre><code>./testcoind getmininginfo
+</code></pre>
+<p>la valeur hashpersec est sup&eacute;rieure &agrave; z&eacute;ro on est donc en train de miner, si vous avez choisi une difficult&eacute; restreinte les blocs vont se cr&eacute;er rapidement&hellip;</p>
+<p>en lan&ccedil;ant</p>
+<pre><code>./testcoind getbalance
+</code></pre>
+<p>au bout de quelques minutes vous devriez avoir un chiffre sup&eacute;rieur &agrave; z&eacute;ro &ccedil;a y est vous avez min&eacute; vos premiers altcoins&hellip;.</p>
+<p>Vos daemon peuvent &ecirc;tre utilis&eacute;s pour l'ensemble des op&eacute;rations sur votre r&eacute;seau d'altcoin, vous pouvez trouver une liste des commandes disponible &agrave; cette adresse :</p>
+<p><a href="https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list">https://en.bitcoin.it/wiki/Original<em>Bitcoin</em>client/API<em>calls</em>list</a></p>
+<p>L'&eacute;tape suivante consistera &agrave; mettre en &laquo; production &raquo; votre altcoin, pour ceci vous devrez donc mettre votre daemon sur un serveur accessible, mettre son adresse ip dans dans src/net.cpp &agrave; la ligne 1193 et ensuite c'est la grande aventure, sachez n&eacute;anmoins qu'il est tr&egrave;s risqu&eacute; d'utiliser &agrave; petite &eacute;chelle votre monnaie&hellip;</p>
+<h1>6. Transfert de vos altcoins min&eacute;s</h1>
+<p>La derni&egrave;re &eacute;tape est de transf&eacute;rer vos altcoins cr&eacute;e vers votre portefeuille Qt sur votre machine Windows.</p>
+<p>Pour ceci vous allez r&eacute;cup&eacute;rer votre r&eacute;pertoire release, il contient testcoin-qt.exe</p>
+<p>En lan&ccedil;ant votre programme vous obtenez une interface de portefeuille dans l'onglet Recevoir vous avez une adresse en faisant clic droit dessus vous pouvez la copier dans votre clipboard, l'&eacute;tape suivante et de transf&eacute;rer des fonds vers cette adresse. On va sur la machine ubuntu et on tape la commande suivante :</p>
+<pre><code>./testcoind sendtoaddress  
+</code></pre>
+<p>Aussit&ocirc;t vous devriez voir arriver vos fonds dans votre portefeuille avec une notification dans la barre de taches&hellip;</p>
+<p>Voil&agrave; vous avez une monnaie pour faire des tests ou utiliser entre amis...</p>
+</body>
+</html>
